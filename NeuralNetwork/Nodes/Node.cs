@@ -29,7 +29,7 @@ namespace NeuralNetwork.Nodes
 
             if (rand != null)
             {
-                Bias = (float)(rand.NextDouble() - 0.5) * 0.01f;
+                Bias = (float)(rand.NextDouble() - 0.5) * 0.1f;
             }
         }
 
@@ -38,7 +38,7 @@ namespace NeuralNetwork.Nodes
         {
             Inputs.AddRange(
                 Enumerable.Range(inputIndex, inputCount)
-                .Select(i => new NodeInput(i, (float)(rand.NextDouble() - 0.5) * 0.01f))
+                .Select(i => new NodeInput(i, (float)(rand.NextDouble() - 0.5) * 0.1f))
                 );
         }
 

@@ -1,4 +1,5 @@
-﻿using NeuralNetwork.Nodes;
+﻿using NeuralNetwork.Extensions;
+using NeuralNetwork.Nodes;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -26,6 +27,10 @@ namespace NeuralNetwork
         public int OutputCount => Layers.Any() ? Layers.Last().NodeCount : 0;
         public int ContextSize => InputCount + Layers.Sum(l => l.NodeCount);
 
+        // learning rates
+        public float LearningRate { get; set; } = 0.05f;
+        public float Momentum { get; set; } = 0.05f;
+
         public Network()
         {
 
@@ -46,7 +51,19 @@ namespace NeuralNetwork
         public Network AddLayer(IActivationFunction func, int count)
         {
             int outputOffset = InputCount + Layers.Sum(l => l.NodeCount);
-            Layers.Add(new NetworkLayer(func, count, outputOffset, rand));
+
+            // default inputs for first layer
+            int inputOffset = 0;
+            int inputCount = InputCount;
+
+            // otherwise take our inputs from the previous layer
+            if (Layers.Any())
+            {
+                inputOffset = Layers.Last().OutputOffset;
+                inputCount = Layers.Last().NodeCount;
+            }
+
+            Layers.Add(new NetworkLayer(func, count, outputOffset, inputOffset, inputCount, rand));
             return this;
         }
 
@@ -58,7 +75,7 @@ namespace NeuralNetwork
         public void Run(INetworkRunContext context)
         {
             // feed-forward through layers
-            foreach(var layer in Layers)
+            foreach (var layer in Layers)
             {
                 layer.Run(context);
             }
@@ -76,6 +93,24 @@ namespace NeuralNetwork
             Layers.Last().SetOutputLayerErrorFromTarget(context);
 
             // back-prop errors
+            foreach (var layer in Layers.FastReverse())
+            {
+                layer.BackPropagateError(context);
+            }
+
+            // update weight error derivatives of all nodes
+            foreach (var node in Layers.SelectMany(l => l.Nodes))
+            {
+                node.UpdateWeightErrorDerivatives(context);
+            }
+        }
+
+        public void Update()
+        {
+            foreach (var node in Layers.SelectMany(l => l.Nodes))
+            {
+                node.UpdateWeights(LearningRate, Momentum);
+            }
         }
     }
 }

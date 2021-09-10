@@ -17,18 +17,18 @@ namespace NeuralNetwork
 
         }
 
-        public NetworkLayer(IActivationFunction func, int count, int outputOffset, Random rand = null)
+        public NetworkLayer(IActivationFunction func, int count, int outputOffset, int inputIndex, int inputCount, Random rand = null)
         {
             Nodes.AddRange(
                 Enumerable.Range(outputOffset, count)
-                .Select(i => new Node(func, i, rand))
+                .Select(i => new Node(func, i, inputIndex, inputCount, rand))
                 );
         }
 
         public void Run(INetworkRunContext context)
         {
             // feed-forward.
-            foreach(var node in Nodes)
+            foreach (var node in Nodes)
             {
                 node.RunInto(context);
             }
@@ -40,7 +40,7 @@ namespace NeuralNetwork
             {
                 throw new InvalidOperationException("SetOutputLayerErrorFromTarget called for an internal layer");
             }
-            foreach(var node in Nodes)
+            foreach (var node in Nodes)
             {
                 node.CalculateError(context);
             }
@@ -48,7 +48,7 @@ namespace NeuralNetwork
 
         public void BackPropagateError(INetworkRunContext context)
         {
-            foreach(var node in Nodes)
+            foreach (var node in Nodes)
             {
                 node.BackPropagateError(context);
             }
