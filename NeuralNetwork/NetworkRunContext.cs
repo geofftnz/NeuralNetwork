@@ -9,16 +9,20 @@ namespace NeuralNetwork
     {
         private float[] activation;
         private float[] error;
-
+        private float[] delta;
         private float[] target;
 
 
-        public IIndexer<float> Activation { get; private set; }
+        public IIndexable<float, int> Activation { get; private set; }
+        public IIndexable<float, int> Error { get; private set; }
+        public IIndexable<float, int> Delta { get; private set; }
+        public IIndexable<float, int> Target { get; private set; }
 
         public NetworkRunContext(int length, int inputs, int outputs)
         {
             activation = new float[length];
             error = new float[length];
+            delta = new float[length];
 
             target = new float[outputs];
 
@@ -29,7 +33,10 @@ namespace NeuralNetwork
             if (OutputStart < 0 || OutputStart >= length)
                 throw new ArgumentOutOfRangeException($"Length & Outputs are out of range.");
 
-            Activation = new Indexer<float>(activation);
+            Activation = Indexer<float, int>.For(activation);
+            Error = Indexer<float, int>.For(error);
+            Delta = Indexer<float, int>.For(delta);
+            Target = Indexer<float, int>.For(target);
         }
 
         public int Length => activation.Length;
@@ -40,24 +47,5 @@ namespace NeuralNetwork
 
         public int OutputStart { get; private set; }
 
-
-        public float GetActivation(int index) => activation[index];
-        public void SetActivation(int index, float value) => activation[index] = value;
-
-        public float GetError(int index) => error[index];
-        public void SetError(int index, float value) => error[index] = value;
-        public void AddError(int index, float value) => error[index] += value;
-
-
-        public float GetOutputTarget(int outputIndex) => target[outputIndex];
-        public void SetOutputTarget(int outputIndex, float value) => target[outputIndex] = value;
-
-        public float GetOutputError(int index)
-        {
-            if (index < OutputStart)
-                throw new InvalidOperationException($"GetOutputError: not an output node ({index})");
-
-            return target[index - OutputStart] - activation[index];
-        }
     }
 }

@@ -27,33 +27,10 @@ namespace NeuralNetwork
         /// </summary>
         int OutputStart { get; }
 
-        /// <summary>
-        /// Sets the activation value of an element in the context.
-        /// </summary>
-        /// <param name="index"></param>
-        /// <param name="value"></param>
-        void SetActivation(int index, float value);
-
-        /// <summary>
-        /// returns the activation value of an element in the context.
-        /// </summary>
-        /// <param name="index"></param>
-        /// <returns></returns>
-        float GetActivation(int index);
-
-        IIndexer<float> Activation { get; }
-
-
-        void SetOutputTarget(int outputIndex, float value);
-        float GetOutputTarget(int outputIndex);
-        float GetOutputError(int index);
-
-        void SetError(int index, float value);
-        void AddError(int index, float value);
-        float GetError(int index);
-
-
-
+        IIndexable<float, int> Activation { get; }
+        IIndexable<float, int> Target { get; }
+        IIndexable<float, int> Error { get; }
+        IIndexable<float, int> Delta { get; }
 
     }
 }

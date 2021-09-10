@@ -72,6 +72,9 @@ namespace NeuralNetwork
                 layer.Run(context);
             }
 
+            // set the error of the output layer
+            Layers.Last().SetOutputLayerErrorFromTarget(context);
+
             // back-prop errors
         }
     }

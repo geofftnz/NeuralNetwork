@@ -46,5 +46,13 @@ namespace NeuralNetwork
             }
         }
 
+        public void BackPropagateError(INetworkRunContext context)
+        {
+            foreach(var node in Nodes)
+            {
+                node.BackPropagateError(context);
+            }
+        }
+
     }
 }

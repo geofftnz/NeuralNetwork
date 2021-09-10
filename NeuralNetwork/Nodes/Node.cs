@@ -16,6 +16,9 @@ namespace NeuralNetwork.Nodes
         public int OutputIndex { get; set; }
 
         public float Bias { get; set; } = 0f;
+        public float DBias { get; set; } = 0f;
+        public float BiasErrorDerivative { get; set; } = 0f;
+
 
         public List<NodeInput> Inputs { get; } = new List<NodeInput>();
 
@@ -41,7 +44,7 @@ namespace NeuralNetwork.Nodes
 
         public void RunInto(INetworkRunContext context)
         {
-            context.SetActivation(OutputIndex, ActivationFunc.Activation(Bias + Inputs.Select(i => context.GetActivation(i.Index) * i.Weight).Sum()));
+            context.Activation[OutputIndex] = ActivationFunc.Activation(Bias + Inputs.Select(i => context.Activation[i.Index] * i.Weight).Sum());
         }
         public void CalculateError(INetworkRunContext context)
         {
@@ -50,23 +53,52 @@ namespace NeuralNetwork.Nodes
                 throw new InvalidOperationException("CalculateError: not an output node.");
             }
 
-            context.SetError(OutputIndex, context.GetOutputError(OutputIndex));
+            context.Error[OutputIndex] = context.Target[OutputIndex - context.OutputStart] - context.Activation[OutputIndex];
         }
 
         public void BackPropagateError(INetworkRunContext context)
         {
             // compute delta (error multiplied by the derivative of our activation function) as e * a * (1-a);
-            //float activation = context.GetActivation(OutputIndex);
-            float activation = context.Activation[OutputIndex];
-            float delta = context.GetError(OutputIndex) * ActivationFunc.Derivative(activation);
+            context.Delta[OutputIndex] = context.Error[OutputIndex] * ActivationFunc.Derivative(context.Activation[OutputIndex]);
 
             // propagate this error to our inputs
             foreach (var input in Inputs)
             {
-                context.AddError(input.Index, delta * input.Weight);
+                context.Error[input.Index] += context.Delta[OutputIndex] * input.Weight;
             }
-
         }
 
-    }
+        public void UpdateWeightErrorDerivatives(INetworkRunContext context)
+        {
+            BiasErrorDerivative += context.Delta[OutputIndex];
+            foreach (var input in Inputs)
+            {
+                input.WeightErrorDerivative += context.Delta[OutputIndex] * context.Activation[input.Index];
+            }
+        }
+
+        public void ClearWeightErrorDerivatives()
+        {
+            BiasErrorDerivative = 0f;
+            foreach (var input in Inputs)
+            {
+                input.WeightErrorDerivative = 0f;
+            }
+        }
+
+        public void UpdateWeights(float learningRate, float momentum)
+        {
+            DBias = BiasErrorDerivative * learningRate + DBias * momentum;
+            Bias += DBias;
+            BiasErrorDerivative = 0f;
+
+            foreach (var input in Inputs)
+            {
+                input.DWeight = input.WeightErrorDerivative * learningRate + input.DWeight * momentum;
+                input.Weight += input.DWeight;
+                input.WeightErrorDerivative = 0f;
+            }
+        }
+
+        }
 }
