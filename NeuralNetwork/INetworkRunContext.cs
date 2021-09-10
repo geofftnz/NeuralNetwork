@@ -28,10 +28,10 @@ namespace NeuralNetwork
         /// </summary>
         int OutputStart { get; }
 
-        IIndexable<float, int> Activation { get; }
-        IIndexable<float, int> Target { get; }
-        IIndexable<float, int> Error { get; }
-        IIndexable<float, int> Delta { get; }
+        IList<float> Activation { get; }
+        IList<float> Target { get; }
+        IList<float> Error { get; }
+        IList<float> Delta { get; }
 
         float TotalError
         {
@@ -82,6 +82,13 @@ namespace NeuralNetwork
             for (int t = 0; t < OutputCount; t++)
             {
                 Target[t] = inputsAndTargets[i++];
+            }
+
+            // reset all errors to zero
+            for (int e = 0; e < Error.Count; e++)
+            {
+                Error[e] = 0f;
+                Delta[e] = 0f;
             }
         }
 

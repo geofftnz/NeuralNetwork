@@ -38,7 +38,7 @@ namespace NeuralNetwork.Nodes
         {
             Inputs.AddRange(
                 Enumerable.Range(inputIndex, inputCount)
-                .Select(i => new NodeInput(i, (float)(rand.NextDouble() - 0.5) * 0.1f))
+                .Select(i => new NodeInput(i, (float)(rand.NextDouble() - 0.5) * 0.5f))
                 );
         }
 

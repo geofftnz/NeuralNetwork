@@ -17,11 +17,11 @@ namespace NeuralNetConsole
 
             var net = new Network();
             net.SetInputs(2);
-            net.AddLayer(activation, 3);
+            net.AddLayer(activation, 2);
             net.AddLayer(activation, 1);
 
-            net.LearningRate = 0.01f;
-            net.Momentum = 0.0f;
+            net.LearningRate = 0.5f;
+            net.Momentum = 0.1f;
 
             var context = net.GetNewContext();
 
@@ -40,7 +40,9 @@ namespace NeuralNetConsole
                 context.SetTraining(trainingruns[rand.Next(trainingruns.Count)]);
                 net.Train(context);
                 net.Update();
-                Console.WriteLine($"Run {i}: {string.Join(',',context.Inputs.Select(x=>x.ToString()))} -> {string.Join(',', context.Outputs.Select(x => x.ToString("0.000")))}  ({string.Join(',', context.Targets.Select(x => x.ToString()))})");
+                Console.WriteLine($"Run {i}: {string.Join(',',context.Inputs.Select(x=>x.ToString()))} -> {string.Join(',', context.Outputs.Select(x => x.ToString("0.000")))}  ({string.Join(',', context.Targets.Select(x => x.ToString()))}) {context.TotalError}");
+
+                //Console.WriteLine($"{i}: {string.Join(',',context.Activation.Select(x=>x.ToString()))}");
             }
 
         }

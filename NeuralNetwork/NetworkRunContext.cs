@@ -13,10 +13,10 @@ namespace NeuralNetwork
         private float[] target;
 
 
-        public IIndexable<float, int> Activation { get; private set; }
-        public IIndexable<float, int> Error { get; private set; }
-        public IIndexable<float, int> Delta { get; private set; }
-        public IIndexable<float, int> Target { get; private set; }
+        public IList<float> Activation => activation;
+        public IList<float> Error => error;
+        public IList<float> Delta => delta;
+        public IList<float> Target => target;
 
         public NetworkRunContext(int length, int inputs, int outputs)
         {
@@ -33,10 +33,6 @@ namespace NeuralNetwork
             if (OutputStart < 0 || OutputStart >= length)
                 throw new ArgumentOutOfRangeException($"Length & Outputs are out of range.");
 
-            Activation = Indexer<float, int>.For(activation);
-            Error = Indexer<float, int>.For(error);
-            Delta = Indexer<float, int>.For(delta);
-            Target = Indexer<float, int>.For(target);
         }
 
         public int Length => activation.Length;
