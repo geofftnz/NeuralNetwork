@@ -92,6 +92,16 @@ namespace NeuralNetwork
             }
         }
 
+        void ClearError()
+        {
+            // assume that error and delta are the same length.
+            for(int i = 0; i < Error.Count; i++)
+            {
+                Error[i] = 0f;
+                Delta[i] = 0f;
+            }
+        }
+
         IEnumerable<float> Inputs
         {
             get

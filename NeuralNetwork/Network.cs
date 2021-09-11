@@ -89,6 +89,9 @@ namespace NeuralNetwork
                 layer.Run(context);
             }
 
+            // Clear all errors
+            context.ClearError();
+
             // set the error of the output layer
             Layers.Last().SetOutputLayerErrorFromTarget(context);
 
@@ -112,7 +115,22 @@ namespace NeuralNetwork
                 node.UpdateWeights(LearningRate, Momentum);
             }
         }
+
+        public void AddNoise(float amount)
+        {
+            foreach (var node in Layers.SelectMany(l => l.Nodes))
+            {
+                node.AddNoise(rand, amount);
+            }
+        }
+
+        public void Reset()
+        {
+            foreach (var node in Layers.SelectMany(l => l.Nodes))
+            {
+                node.Reset(rand);
+            }
+        }
     }
 }
-
 

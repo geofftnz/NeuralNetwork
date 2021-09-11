@@ -38,8 +38,27 @@ namespace NeuralNetwork.Nodes
         {
             Inputs.AddRange(
                 Enumerable.Range(inputIndex, inputCount)
-                .Select(i => new NodeInput(i, (float)(rand.NextDouble() - 0.5) * 0.5f))
+                .Select(i => new NodeInput(i, (float)(rand.NextDouble() - 0.5) * 0.1f))
                 );
+        }
+
+        public void ResetWeights(Random rand)
+        {
+            foreach (var input in Inputs)
+            {
+                input.Weight = (float)(rand.NextDouble() - 0.5) * 0.1f;
+                input.DWeight = 0f;
+                input.WeightErrorDerivative = 0f;
+            }
+        }
+
+        public void Reset(Random rand)
+        {
+            ResetWeights(rand);
+
+            Bias = 0f;
+            DBias = 0f;
+            BiasErrorDerivative = 0f;
         }
 
         public void RunInto(INetworkRunContext context)
@@ -100,5 +119,13 @@ namespace NeuralNetwork.Nodes
             }
         }
 
+        public void AddNoise(Random rand, float amount)
+        {
+            foreach (var input in Inputs)
+            {
+                input.Weight += (float)(rand.NextDouble() - 0.5) * 2f * amount;
+            }
         }
+
+    }
 }
