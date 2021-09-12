@@ -40,7 +40,7 @@ namespace NeuralNetwork
                 float total = 0f;
                 for (int i = OutputStart; i < OutputStart + OutputCount; i++)
                 {
-                    total += Error[i] * Error[i];
+                    total += Error[i]*Error[i];
                 }
                 return total / OutputCount;
             }

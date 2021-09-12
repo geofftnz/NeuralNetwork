@@ -3,6 +3,7 @@ using NeuralNetwork.Nodes;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Text;
 
 namespace NeuralNetwork
 {
@@ -108,7 +109,24 @@ namespace NeuralNetwork
             }
         }
 
-        public void Update()
+        public float Test(INetworkRunContext context)
+        {
+            // feed-forward through layers
+            foreach (var layer in Layers)
+            {
+                layer.Run(context);
+            }
+
+            // Clear all errors
+            context.ClearError();
+
+            // set the error of the output layer
+            Layers.Last().SetOutputLayerErrorFromTarget(context);
+
+            return context.TotalError;
+        }
+
+            public void Update()
         {
             foreach (var node in Layers.SelectMany(l => l.Nodes))
             {
@@ -130,6 +148,11 @@ namespace NeuralNetwork
             {
                 node.Reset(rand);
             }
+        }
+
+        public override string ToString()
+        {
+            return $"in:({InputCount})->" + string.Join("->", Layers.Select(layer => layer.ToString()));
         }
     }
 }

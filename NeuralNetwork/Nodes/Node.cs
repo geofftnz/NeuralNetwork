@@ -127,5 +127,10 @@ namespace NeuralNetwork.Nodes
             }
         }
 
+        public override string ToString()
+        {
+            return $"({Bias}+"+string.Join(',', Inputs.Select(input => input.Index.ToString() + ":" + input.Weight.ToString()))+")";
+        }
+
     }
 }
