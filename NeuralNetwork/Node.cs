@@ -1,9 +1,10 @@
-﻿using System;
+﻿using NeuralNetwork.Nodes;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 
-namespace NeuralNetwork.Nodes
+namespace NeuralNetwork
 {
     /// <summary>
     /// Standard neural network node.

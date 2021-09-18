@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.Text;
 
-namespace NeuralNetwork.Nodes
+namespace NeuralNetwork
 {
     public interface INeuralNetworkNode
     {

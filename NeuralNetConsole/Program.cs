@@ -15,10 +15,10 @@ namespace NeuralNetConsole
             Console.WriteLine("NeuralNetwork testbench");
 
             IActivationFunction activation = new Tanh();
-            
+
             var net = new Network();
             net.SetInputs(2);
-            net.AddLayer(activation, 4);
+            net.AddLayer(activation, 2);
             net.AddLayer(activation, 1);
 
             net.LearningRate = 0.5f;
@@ -38,15 +38,18 @@ namespace NeuralNetConsole
 
             // do some training
             int totalConvergence = 0;
-            int samples = 100;
-            float errorThreshold = 0.05f;
+            int samples = 1000;
+            float errorThreshold = 0.02f;
             int trainingRunCount = 1000000;
 
             float annealingRateBase = 0.1f;
             float annealingRate = annealingRateBase;
             float annealingDecay = 0.98f;
-            float annealingErrorThreshold = 0.2f;
-            int annealingInterval = 100;
+            float annealingErrorThreshold = 0.1f;
+            int annealingInterval = 1000;
+
+            int abandonInterval = 10000;
+            float abandonErrorThreshold = 0.1f;
 
             Console.WriteLine($"Converging {samples} times to error<{errorThreshold} using activation {activation.GetType().Name}...");
             var sw = Stopwatch.StartNew();
@@ -59,7 +62,7 @@ namespace NeuralNetConsole
                 {
                     context.SetTraining(trainingruns[rand.Next(trainingruns.Count)]);
                     net.Train(context);
-                    
+
                     net.Update();
 
                     error = error * 0.9f + 0.1f * trainingruns.Select(tr =>
@@ -78,17 +81,23 @@ namespace NeuralNetConsole
                     //    net.Momentum = error * 0.1f;
                     //    //Console.WriteLine($"->{net.LearningRate} {net.Momentum}");
                     //}
-                    
+
                     //if (error > 0.2f && i%10 == 0)
                     //{
                     //    net.AddNoise((error - 0.2f) * 0.05f);
                     //}
 
-                    if (i%annealingInterval == 0)
+                    if (i % annealingInterval == 0)
                     {
                         annealingRate = (error > annealingErrorThreshold) ? annealingRateBase : annealingRate * annealingDecay;
 
                         net.AddNoise(annealingRate);
+                    }
+
+                    if (i > abandonInterval && i % abandonInterval == 0 && error > abandonErrorThreshold)
+                    {
+                        Console.WriteLine($"Abandoning this attempt at {i} iterations");
+                        net.Reset();
                     }
 
                     /*
@@ -120,7 +129,7 @@ namespace NeuralNetConsole
                 }
             }
 
-            Console.WriteLine($"Average convergence iterations {totalConvergence / samples} in {sw.ElapsedMilliseconds} ms");
+            Console.WriteLine($"Average convergence iterations {totalConvergence / samples} in {sw.ElapsedMilliseconds / samples} ms per run.");
         }
     }
 }
